@@ -4,7 +4,7 @@
   "description": "see wiki please.",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "electron ."
   },
   "repository": {
     "type": "git",
@@ -15,5 +15,9 @@
   "bugs": {
     "url": "https://github.com/KingerWu/ArkPc/issues"
   },
-  "homepage": "https://github.com/KingerWu/ArkPc#readme"
+  "homepage": "https://github.com/KingerWu/ArkPc#readme",
+  "devDependencies": {
+    "cross-env": "7.0.0",
+    "electron": "9.0.5"
+  }
 }
