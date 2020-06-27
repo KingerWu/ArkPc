@@ -1,15 +1,62 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <title>Hello World!</title>
-    <!-- https://electronjs.org/docs/tutorial/security#csp-meta-tag -->
-    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
-  </head>
-  <body>
-    <h1>Hello World!</h1>
-    We are using node <script>document.write(process.versions.node)</script>,
-    Chrome <script>document.write(process.versions.chrome)</script>,
-    and Electron <script>document.write(process.versions.electron)</script>.
-  </body>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Hello World!</title>
+  <!-- https://electronjs.org/docs/tutorial/security#csp-meta-tag -->
+  <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+</head>
+
+<body>
+  <h1>Hello World!</h1>
+  We are using node
+  <script>document.write(process.versions.node)</script>,
+  Chrome
+  <script>document.write(process.versions.chrome)</script>,
+  and Electron
+  <script>document.write(process.versions.electron)</script>.
+
+  <hr />
+  <button type="button" onclick="asyncTest()">渲染进程-&gt;主进程 异步消息测试</button>
+  <button type="button" onclick="syncTest()">渲染进程-&gt;主进程 同步消息测试</button>
+
+
+  <textarea id="notify" rows="4" cols="50">
+    主进程-&gt;渲染进程，定时器通知消息：
+  </textarea>
+
+
+  <script>
+    /**
+     * 异步事件 
+     */
+    function asyncTest() {
+      ipcRenderer.send('asynchronous-message', 'ping')
+    }
+
+    /**
+     * 同步事件 
+     */
+    function syncTest() {
+      const reply = ipcRenderer.sendSync('synchronous-message', 'ping')
+      const message = `Synchronous message reply: ${reply}`
+      alert(message);
+    }
+
+    const { ipcRenderer } = require('electron')
+    // 监听事件
+    ipcRenderer.on('asynchronous-reply', (event, arg) => {
+      console.log('asynchronous-reply : args:', arg)
+      const message = `Asynchronous message reply: ` + JSON.stringify(arg)
+      alert(message);
+    })
+    // 监听事件
+    ipcRenderer.on('ping', function (event, message) {
+      console.log(message);  // Prints "whoooooooh!"
+      document.getElementById("notify").innerHTML = document.getElementById("notify").innerHTML + message + "\n";
+    });
+  </script>
+</body>
+
 </html>

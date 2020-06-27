@@ -1,6 +1,7 @@
 const { app, BrowserWindow } = require('electron')
 
-function createWindow () {   
+
+function createWindow() {
   // 创建浏览器窗口
   const win = new BrowserWindow({
     width: 800,
@@ -14,7 +15,35 @@ function createWindow () {
   win.loadFile('index.html')
 
   // 打开开发者工具
-  win.webContents.openDevTools()
+  // win.webContents.openDevTools()
+
+
+  const { ipcMain } = require('electron')
+
+  let num = 1;
+  // 异步事件
+  ipcMain.on('asynchronous-message', (event, arg) => {
+    event.sender.send('asynchronous-reply', { 'ping': 'pong', 'num': num++ })
+  })
+
+  // 同步事件
+  ipcMain.on('synchronous-message', (event, arg) => {
+    event.returnValue = 'pong'
+  })
+
+  // 定时器发送
+  let loopId;
+  win.webContents.on('did-finish-load', function () {
+    loopId = setInterval(() => {
+      win.webContents.send('ping', "send:" + new Date());
+    }, 5 * 1000);
+  });
+
+  win.webContents.on('destroyed', function () {
+    if (loopId) {
+      clearInterval(loopId);
+    }
+  });
 }
 
 // Electron会在初始化完成并且准备好创建浏览器窗口时调用这个方法
